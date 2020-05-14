@@ -5,8 +5,10 @@
 package it.polito.tdp.crimes;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.crimes.model.CoppiaOffense;
 import it.polito.tdp.crimes.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -25,10 +27,10 @@ public class FXMLController {
     private URL location;
 
     @FXML // fx:id="boxCategoria"
-    private ComboBox<?> boxCategoria; // Value injected by FXMLLoader
+    private ComboBox<String> boxCategoria; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxMese"
-    private ComboBox<?> boxMese; // Value injected by FXMLLoader
+    private ComboBox<Integer> boxMese; // Value injected by FXMLLoader
 
     @FXML // fx:id="btnAnalisi"
     private Button btnAnalisi; // Value injected by FXMLLoader
@@ -50,6 +52,30 @@ public class FXMLController {
     @FXML
     void doCreaGrafo(ActionEvent event) {
 
+    	txtResult.clear();
+    	
+    	
+    	String categoria= this.boxCategoria.getValue(); 
+    	
+    	if(categoria.length()==0) {
+    		txtResult.appendText("ERRORE : Selezionare una categoria! \n");
+    		return; 
+    	}
+    	
+       Integer mese= this.boxMese.getValue(); 
+    	
+    	if(mese==null) {
+    		txtResult.appendText("ERRORE : Selezionare un mese! \n");
+    		return; 
+    	}
+    	
+    	//tutto ok
+    	this.model.creaGrafo(categoria, mese);
+    	List<CoppiaOffense> lista=this.model.getArchi();
+    	txtResult.appendText("Aechi con peso > peso medio: \n\n");
+    	for(CoppiaOffense c: lista) {
+    		txtResult.appendText(c.toString()+"\n"); 
+    	}
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
@@ -65,5 +91,7 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	this.boxCategoria.getItems().addAll(this.model.getCategorie()); 
+    	this.boxMese.getItems().addAll(this.model.getMesi()); 
     }
 }
