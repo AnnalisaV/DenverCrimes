@@ -36,7 +36,7 @@ public class FXMLController {
     private Button btnAnalisi; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxArco"
-    private ComboBox<?> boxArco; // Value injected by FXMLLoader
+    private ComboBox<CoppiaOffense> boxArco; // Value injected by FXMLLoader
 
     @FXML // fx:id="btnPercorso"
     private Button btnPercorso; // Value injected by FXMLLoader
@@ -47,6 +47,19 @@ public class FXMLController {
     @FXML
     void doCalcolaPercorso(ActionEvent event) {
 
+    	txtResult.clear(); 
+    	
+    	CoppiaOffense vertici=this.boxArco.getValue();
+    	if(vertici==null) {
+    		txtResult.appendText("ERRORE : Selezionare due crimes\n");
+    		return; 
+    	}
+    	
+    	List<String> percorso= this.model.trovaPercorso(vertici.getOffense1(), vertici.getOffense2()); 
+    	txtResult.appendText("Percorso migliore : \n\n");
+    	for (String s : percorso) {
+    		txtResult.appendText(s+"\n");
+    	}
     }
 
     @FXML
@@ -72,6 +85,11 @@ public class FXMLController {
     	//tutto ok
     	this.model.creaGrafo(categoria, mese);
     	List<CoppiaOffense> lista=this.model.getArchi();
+    	
+    	// per l'esercizio 2
+    	this.boxArco.getItems().removeAll(boxArco.getItems()); //prima la pulisco
+    	this.boxArco.getItems().addAll(lista); //metto quello che mi serve
+    	
     	txtResult.appendText("Aechi con peso > peso medio: \n\n");
     	for(CoppiaOffense c: lista) {
     		txtResult.appendText(c.toString()+"\n"); 

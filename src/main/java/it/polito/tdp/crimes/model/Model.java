@@ -14,6 +14,7 @@ public class Model {
 	
 	private EventsDao dao; 
 	private Graph<String, DefaultWeightedEdge> graph; 
+	private List<String> percorsoMigliore; 
 	
 	public Model() {
 		this.dao= new EventsDao(); 
@@ -78,5 +79,44 @@ public class Model {
 		}
 		return archi; // se voglio la ordino anche per peso
 		
+	}
+	
+	/**
+	 * Dati due vertici (partenza e arrivo), trovare il percorso che li collega con il numero massimo
+	 * di vertici attraversati
+	 */
+	public List<String> trovaPercorso(String partenza, String destinazione){
+		this.percorsoMigliore=new ArrayList<>(); //sempre pulita ad ogni chiamata
+		
+		List<String> parziale= new ArrayList<>(); //quella da riempire nella procedura ricorsiva
+		parziale.add(partenza); 
+		
+		trovaRicorsivo(parziale, destinazione, 0); 
+		return this.percorsoMigliore; 
+	}
+
+	//algoritmo ricorsivo
+	private void trovaRicorsivo(List<String> parziale, String destinazione, int livello) {
+		
+		//caso terminale 
+		//-> ultimo vertice inserito in parziale e' la destinazione
+		if(parziale.get(parziale.size()-1).equals(destinazione)) {
+			//ma e' la soluzione ottimale?
+			if(parziale.size() > this.percorsoMigliore.size()) {
+				this.percorsoMigliore=new ArrayList<>(parziale); 
+			}
+			return; 
+		}
+		
+		//caso generale 
+		//-> prendo i vicini dell'ultimo inserito
+		for (String vicino : Graphs.neighborListOf(this.graph, parziale.get(parziale.size()-1))) {
+			//il cammino dev'essere aciclico quindi il vertice non dev'essere gia' in parziale
+			if(!parziale.contains(vicino)) {
+				parziale.add(vicino); 
+				trovaRicorsivo(parziale, destinazione, livello+1); //in realta' il livello non serve 
+				parziale.remove(parziale.size()-1); 
+			}
+		}
 	}
 }
